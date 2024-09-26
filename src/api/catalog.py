@@ -1,6 +1,11 @@
 from fastapi import APIRouter
+import sqlalchemy
+from src import database as db
 
 router = APIRouter()
+
+with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold=1"))
 
 
 @router.get("/catalog/", tags=["catalog"])
