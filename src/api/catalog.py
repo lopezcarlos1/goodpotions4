@@ -4,22 +4,21 @@ from src import database as db
 
 router = APIRouter()
 
-with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold=1"))
-
-
 @router.get("/catalog/", tags=["catalog"])
 def get_catalog():
     """
     Each unique item combination must have only a single price.
     """
+    catalog=[]
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).scalar()
 
-    return [
-            {
-                "sku": "RED_POTION_0",
-                "name": "red potion",
-                "quantity": 1,
+        if result > 0:
+            catalog.append({
+                "sku": "GREEN_POTION_0",
+                "name": "green potion",
+                "quantity": result,
                 "price": 50,
-                "potion_type": [100, 0, 0, 0],
-            }
-        ]
+                "potion_type": [0, 100, 0, 0], #only return 6 catalog items
+            })
+    return catalog
